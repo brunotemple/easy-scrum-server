@@ -4,7 +4,8 @@ const { ApolloServer, gql } = require("apollo-server");
 const mongoose = require("mongoose");
 
 mongoose.connect("mongodb+srv://admin:admin@cluster0-yjgfz.mongodb.net/test?retryWrites=true&w=majority", {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
 const db = mongoose.connection;
@@ -64,20 +65,24 @@ const typeDefs = gql`
     }
 
     input TaskStatusInput {
+        id: ID
         title: String
         order: Int
     }
 
     input UserInput {
+        id: ID
         firstName: String
         lastName: String
     }
 
     input TaskTypeInput {
+        id: ID
         title: String
     }
 
     input TaskInput {
+        id: ID
         description: String
         ownerId: String
         statusId: String
@@ -93,10 +98,18 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        addTaskStatus(status: TaskStatusInput): [TaskStatus]
-        addUser(user: UserInput): [User]
-        addTaskType(type: TaskTypeInput): [TaskType]
-        addTask(task: TaskInput): [Task]
+        addTaskStatus(status: TaskStatusInput!): [TaskStatus]
+        updateTaskStatus(status: TaskStatusInput!): [TaskStatus]
+        deleteTaskStatus(id: ID!): [TaskStatus]
+        addUser(user: UserInput!): [User]
+        updateUser(user: UserInput!): [User]
+        deleteUser(id: ID!): [User]
+        addTaskType(type: TaskTypeInput!): [TaskType]
+        updateTaskType(type: TaskTypeInput!): [TaskType]
+        deleteTaskType(id: ID!): [TaskType]
+        addTask(task: TaskInput!): [Task]
+        updateTask(task: TaskInput!): [Task]
+        deleteTask(id: ID!): [Task]
     }
 `;
 
@@ -140,7 +153,7 @@ const resolvers = {
         }
     },
     Mutation: {
-        addTaskStatus: async (obj, { status }) => {
+        addTaskStatus: async (_, { status }) => {
             try {
                 await TaskStatus.create({
                     ...status
@@ -152,7 +165,31 @@ const resolvers = {
                 return [];
             }
         },
-        addUser: async (obj, { user }) => {
+        updateTaskStatus: async (_, { status }) => {
+            try {
+                await TaskStatus.update({
+                    ...status
+                });
+                const allTaskStatuses = await TaskStatus.find();
+                return allTaskStatuses;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        deleteTaskStatus: async (_, { id }) => {
+            try {
+                const deleteTaskStatus = await TaskStatus.findById(id);
+                await deleteTaskStatus.delete();
+
+                const allTaskStatuses = await TaskStatus.find();
+                return allTaskStatuses;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        addUser: async (_, { user }) => {
             try {
                 await User.create({
                     ...user
@@ -164,7 +201,31 @@ const resolvers = {
                 return [];
             }
         },
-        addTaskType: async (obj, { type }) => {
+        updateUser: async (_, { user }) => {
+            try {
+                await User.update({
+                    ...user
+                });
+                const allUsers = await User.find();
+                return allUsers;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        deleteUser: async (_, { id }) => {
+            try {
+                const deleteUser = await User.findById(id);
+                await deleteUser.delete();
+
+                const allUsers = await User.find();
+                return allUsers;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        addTaskType: async (_, { type }) => {
             try {
                 await TaskType.create({
                     ...type
@@ -176,11 +237,59 @@ const resolvers = {
                 return [];
             }
         },
-        addTask: async (obj, { task }) => {
+        updateTaskType: async (_, { type }) => {
+            try {
+                await TaskType.update({
+                    ...type
+                });
+                const allTaskType = await TaskType.find();
+                return allTaskType;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        deleteTaskType: async (_, { id }) => {
+            try {
+                const deleteTaskType = await TaskType.findById(id);
+                await deleteTaskType.delete();
+
+                const allTaskType = await TaskType.find();
+                return allTaskType;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        addTask: async (_, { task }) => {
             try {
                 await Task.create({
                     ...task
                 });
+                const allTasks = await Task.find();
+                return allTasks;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        updateTask: async (_, { task }) => {
+            try {
+                await Task.update({
+                    ...task
+                });
+                const allTasks = await Task.find();
+                return allTasks;
+            } catch (error) {
+                console.log("error", error);
+                return [];
+            }
+        },
+        deleteTask: async (_, { id }) => {
+            try {
+                const deleteTask = await Task.findById(id);
+                await deleteTask.delete();
+
                 const allTasks = await Task.find();
                 return allTasks;
             } catch (error) {
