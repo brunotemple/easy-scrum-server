@@ -2,8 +2,9 @@ const { ApolloServer, gql } = require("apollo-server");
 //const { GraphQLScalarType } = require("graphql");
 //const { Kind } = require("graphql/language");
 const mongoose = require("mongoose");
+const { userDB, passwordDB } = require("../supersecret");
 
-mongoose.connect("mongodb+srv://admin:admin@cluster0-yjgfz.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect(`mongodb+srv://${userDB}:${passwordDB}@cluster0-yjgfz.mongodb.net/test?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -167,9 +168,9 @@ const resolvers = {
         },
         updateTaskStatus: async (_, { status }) => {
             try {
-                await TaskStatus.update({
-                    ...status
-                });
+                const updateTaskStatus = await TaskStatus.findById(status.id);
+                await updateTaskStatus.update({ ...status });
+
                 const allTaskStatuses = await TaskStatus.find();
                 return allTaskStatuses;
             } catch (error) {
@@ -203,9 +204,9 @@ const resolvers = {
         },
         updateUser: async (_, { user }) => {
             try {
-                await User.update({
-                    ...user
-                });
+                const updateUser = await User.findById(user.id);
+                await updateUser.update({ ...user });
+
                 const allUsers = await User.find();
                 return allUsers;
             } catch (error) {
@@ -239,9 +240,9 @@ const resolvers = {
         },
         updateTaskType: async (_, { type }) => {
             try {
-                await TaskType.update({
-                    ...type
-                });
+                const updateTaskType = await TaskType.findById(type.id);
+                await updateTaskType.update({ ...type });
+
                 const allTaskType = await TaskType.find();
                 return allTaskType;
             } catch (error) {
@@ -275,9 +276,9 @@ const resolvers = {
         },
         updateTask: async (_, { task }) => {
             try {
-                await Task.update({
-                    ...task
-                });
+                const updateTask = await Task.findById(task.id);
+                await updateTask.update({ ...task });
+
                 const allTasks = await Task.find();
                 return allTasks;
             } catch (error) {
